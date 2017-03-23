@@ -30,18 +30,34 @@ class Handler(BaseHTTPRequestHandler):
 
 		return sessJSON
 
+	# def do_POST(self):
+	# 	self.send_response(200)
+	# 	self.send_header('Access-Control-Allow-Origin', '*')
+	# 	self.end_headers()
+		
+	# 	message = urllib.unquote_plus(self.path)
+	# 	user_id, session_id , user_input_real = message.split('|')
+
+	# 	illness = retval.retreive(user_input_real)[0][0]
+	# 	response = "I think you have " + illness
+		
+	# 	self.wfile.write(response)
+		
+	# 	return
+
 	def do_POST(self):
 		self.send_response(200)
 		self.send_header('Access-Control-Allow-Origin', '*')
 		self.end_headers()
 		
-		message = urllib.unquote_plus(self.path)
-		user_id, session_id , user_input_real = message.split('|')
+		print self.path
+		# message = urllib.unquote_plus(self.path)
+		# user_id, session_id , user_input_real = message.split('|')
 
-		illness = retval.retreive(user_input_real)[0][0]
-		response = "I think you have " + illness
+		# illness = retval.retreive(user_input_real)[0][0]
+		# response = "I think you have " + illness
 		
-		self.wfile.write(response)
+		# self.wfile.write(response)
 		
 		return
 
