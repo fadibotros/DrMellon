@@ -90,12 +90,13 @@ class DialogManager():
 
 	def getResponse(self,sessJSON, requestJSON):
 
-		if event['request']['type'] == "LaunchRequest":
-			return say_hello()
-		elif event['request']['type'] == "IntentRequest":
-			return on_intent2(event['request'], event['session'])
-		elif event['request']['type'] == "SessionEndedRequest":
-			return on_session_ended(event['request'], event['session'])
+		response = say_hello()
+		# if event['request']['type'] == "LaunchRequest":
+		# 	return say_hello()
+		# elif event['request']['type'] == "IntentRequest":
+		# 	return on_intent(event['request'], event['session'])
+		# elif event['request']['type'] == "SessionEndedRequest":
+		# 	return on_session_ended(event['request'], event['session'])
 		
 
 		return response

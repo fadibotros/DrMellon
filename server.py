@@ -53,14 +53,11 @@ class Handler(BaseHTTPRequestHandler):
 		self.end_headers()
 		
 		print "hello"
-		print json.loads(self.path)
-		# message = urllib.unquote_plus(self.path)
-		# user_id, session_id , user_input_real = message.split('|')
+		requestJson = json.loads(self.path)
+		responseJson = dm.getResponse(None,requestJson)
 
-		# illness = retval.retreive(user_input_real)[0][0]
-		# response = "I think you have " + illness
-		
-		# self.wfile.write(response)
+		response = json.dumps(responseJson)
+		self.wfile.write(response)
 		
 		return
 
