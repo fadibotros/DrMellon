@@ -11,8 +11,10 @@ import time
 from datetime import datetime
 # from db import s3store
 from retrieval import Retrieval
+from DialogManager import DialogManager
 
-retval = Retrieval()
+# retval = Retrieval()
+dm = DialogManager()
 
 class Handler(BaseHTTPRequestHandler):
 
@@ -50,7 +52,8 @@ class Handler(BaseHTTPRequestHandler):
 		self.send_header('Access-Control-Allow-Origin', '*')
 		self.end_headers()
 		
-		print self.path
+		print "hello"
+		print json.loads(self.path)
 		# message = urllib.unquote_plus(self.path)
 		# user_id, session_id , user_input_real = message.split('|')
 
