@@ -6,8 +6,6 @@ import json
 import requests
 import re
 import string
-from lxml import html
-from lxml import etree
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
