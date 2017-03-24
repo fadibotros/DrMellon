@@ -8,7 +8,7 @@ from retrieval import Retrieval
 class DialogManager():
 
 	def __init__(self):
-		# self.retval = Retrieval()
+		self.retval = Retrieval()
 		i =1
 
 	def build_speechlet_response(self,title, output, reprompt_text, should_end_session):
@@ -63,16 +63,27 @@ class DialogManager():
 		return build_response({}, build_speechlet_response(
 			card_title, speech_output, reprompt_text, should_end_session))
 
+	def handleDefinitionIntent(intentObj):
+		illnessName = intentObj["slots"]["Illnesses"]["value"]
+		illness = self.retval.getIllnessByName(illnessName)
+
+		card_title = "About: " + illness["title"]
+		speech_output = illness["definition"][0]
+		reprompt_text = illness["definition"][0]
+		should_end_session = False
+
+		return build_response({}, build_speechlet_response(
+			card_title, speech_output, reprompt_text, should_end_session))
+
+
 	def on_intent(self,intent_request, session):
 		""" Called when the user specifies an intent for this skill """
 
-		print("on_intent requestId=" + intent_request['requestId'] +
-			  ", sessionId=" + session['sessionId'])
+		print intent_request
 
 		intent = intent_request['intent']
 		intent_name = intent_request['intent']['name']
-
-		print("*** Intent Name: " + intent_name)
+		slots = intent_request['intent']['slots']
 
 		# Dispatch to your skill's intent handlers
 		if intent_name == "HelloIntent":
@@ -84,19 +95,16 @@ class DialogManager():
 		elif intent_name == "RawText":
 			return handle_chat(intent_request, session['sessionId'], session['user']['userId'])
 		elif intent_name == "definitionIntent":
-			return test(intent_request, session['sessionId'], session['user']['userId'])
+			return handleDefinitionIntent(intent_request["intent"])
 		else:
 			raise ValueError("Invalid intent")	    
 
 	def getResponse(self,sessJSON, requestJSON):
 
-		response = self.say_hello()
-		# if event['request']['type'] == "LaunchRequest":
-		# 	return say_hello()
-		# elif event['request']['type'] == "IntentRequest":
-		# 	return on_intent(event['request'], event['session'])
-		# elif event['request']['type'] == "SessionEndedRequest":
-		# 	return on_session_ended(event['request'], event['session'])
-		
+		response = None
+		if event['request']['type'] == "LaunchRequest":
+			response = say_hello()
+		elif event['request']['type'] == "IntentRequest":
+			response = on_intent(event['request'], event['session'])
 
 		return response

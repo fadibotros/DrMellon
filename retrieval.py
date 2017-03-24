@@ -12,6 +12,7 @@ from nltk.stem import WordNetLemmatizer
 from collections import defaultdict
 from scipy.spatial.distance import cosine
 import numpy as np
+from fuzzywuzzy import fuzz
 
 class Retrieval():
 
@@ -65,10 +66,40 @@ class Retrieval():
 		scores = sorted(scores, key = lambda x: x[1])
 		return scores
 
+	def getIllnessByName(self, illnessName):
+		iName = illnessName.lower()
+		scores = []
+
+		for d in self.data:
+			if iName == d["title"].lower():
+				return d
+			simScore = fuzz.partial_ratio(illnessName, d["title"].lower())
+			# simScore = fuzz.ratio(illnessName, d["title"].lower())
+			scores.append((d,simScore))
+
+		scores = sorted(scores, key = lambda x: -x[1])
+		return scores[0][1]
+
+		# if scores[0][1] > 80:
+		# 	return scores[0][0]
+		# else:
+		# 	return None
+
 
 if __name__ == '__main__':
 
 	retval = Retrieval()
+
+	# while True:
+	# 	query = raw_input("illness name: ")
+
+	# 	answers = retval.getIllnessByName(query)
+	# 	# print answers
+
+	# 	for a in answers[:20]:
+	# 		print a
+
+	# 	print ""
 
 	# query = "Everytime I eat shellfish or seafood, my tongue swells up. My face also swells up. I think I have an allergy"
 	# query = "I get distracted easily. I can't focus in class or when I'm studying. I always get distracted."
@@ -80,10 +111,10 @@ if __name__ == '__main__':
 	# query = "I drank a lot of beer and wine last night and now I have a really bad headache and I feel very dehydrated and tired"
 	# query = "I am sneezing a lot. I can't breath through my nose. I have a really bad headache."
 	
-	while True:
-		query = raw_input("Your symptoms: ")
+	# while True:
+	# 	query = raw_input("Your symptoms: ")
 
-		answers = retval.retreive(query)
+	# 	answers = retval.retreive(query)
 
-		for a in answers[:10]:
-			print a
+	# 	for a in answers[:10]:
+	# 		print a
