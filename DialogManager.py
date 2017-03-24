@@ -42,17 +42,15 @@ class DialogManager():
 	# --------------- Functions that control the skill's behavior ------------------
 	def say_hello(self):
 		session_attributes = {}
-		card_title = "Hi, I'm doctor Mellon. How can I assisst you?"
-		speech_output = "Hi, I'm doctor Mellon. How can I assisst you?"
-		reprompt_text = "What can I help you with?"
+		output = "Hi, I'm doctor Mellon. How can I assisst you?"
 		should_end_session = False
 		return self.build_response(session_attributes, self.build_speechlet_response(
-			card_title, speech_output, reprompt_text, should_end_session))
+			output, output, output, should_end_session))
 
 	def stop(self):
 		output = "Have a nice day!"
 		should_end_session = True
-		return build_response({}, self.build_speechlet_response(
+		return self.build_response({}, self.build_speechlet_response(
 			output, output, None, should_end_session))
 
 	def help(self):
@@ -91,6 +89,24 @@ class DialogManager():
 		return self.build_response({}, self.build_speechlet_response(
 				output, output, output, should_end_session))
 
+	def handleTreatmentIntent(self,intentObj):
+		should_end_session = False
+		output = None
+
+		# check if user specified an illness
+		if "value" in intentObj["slots"]["Illnesses"]:
+			illnessName = intentObj["slots"]["Illnesses"]["value"]
+			illness = self.retval.getIllnessByName(illnessName)
+
+			output = " ".join(illness["treatment"][:2])
+			should_end_session = False
+		elif self.currentIllness != None:
+			output = " ".join(self.currentIllness["treatment"][:2])
+		else:
+			output = "Sorry I didn't quite understand that..."
+
+		return self.build_response({}, self.build_speechlet_response(
+				output, output, output, should_end_session))
 
 
 	def on_intent(self,intent_request, session):
