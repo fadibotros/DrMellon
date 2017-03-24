@@ -108,6 +108,13 @@ class DialogManager():
 		return self.build_response({}, self.build_speechlet_response(
 				output, output, output, should_end_session))
 
+	def handleFreeText(self,intentObj):
+		freeText = intentObj["slots"]["Words"]["value"]
+		illness = self.retval.retreive(freeText)
+		output = "I think you have " + illness
+		should_end_session = False
+		return self.build_response({}, self.build_speechlet_response(
+				output, output, output, should_end_session))
 
 	def on_intent(self,intent_request, session):
 		""" Called when the user specifies an intent for this skill """
@@ -125,7 +132,7 @@ class DialogManager():
 		elif intent_name == "HelpIntent":
 			return self.help()
 		elif intent_name == "RawText":
-			return self.handle_chat(intent_request, session['sessionId'], session['user']['userId'])
+			return self.handleFreeText(intent_request["intent"])
 		elif intent_name == "symptomsIntent":
 			return self.handleSymptomsIntent(intent_request["intent"])
 		elif intent_name == "treatmentIntent":

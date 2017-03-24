@@ -129,29 +129,44 @@ def saveToJSON(data, outfile):
 	with open(outfile, 'w') as outfile:
 		json.dump(data,outfile ,indent=4)
 
+def readData(filename):
+	with open(filename) as data_file:
+		return json.load(data_file)
+
+def printIllnesses():
+	data = readData("data.json")
+	f = open('illnesses.txt', 'w')
+
+	for d in data:
+		f.write(d["title"].encode('utf-8') + "\n")
+
+	f.close()
+
+
 if __name__ == '__main__':
-	print "Reading data..."
-	data = getAllDataFromDir("./data/")
-	# data = getAllDataFromDir("./testData/")
+	printIllnesses()
+	# print "Reading data..."
+	# data = getAllDataFromDir("./data/")
+	# # data = getAllDataFromDir("./testData/")
 
-	print "Reducing data..."
-	data = reduce(data)
+	# print "Reducing data..."
+	# data = reduce(data)
 
-	print "Cleaning data..."
-	data = cleanData(data)
+	# print "Cleaning data..."
+	# data = cleanData(data)
 
-	print "Adding tokens..."
-	data = addTokens(data)
+	# print "Adding tokens..."
+	# data = addTokens(data)
 
-	print "Getting vocab..."
-	vocabMap = getVocab(data)
-	saveToJSON(vocabMap, "vocab.json")
+	# print "Getting vocab..."
+	# vocabMap = getVocab(data)
+	# saveToJSON(vocabMap, "vocab.json")
 
-	print "Calculating DF..."
-	dfCounts = getDFcounts(data, vocabMap)
+	# print "Calculating DF..."
+	# dfCounts = getDFcounts(data, vocabMap)
 
-	print "Creating doc vecs..."
-	data = createDocVecs(data, vocabMap, dfCounts)
+	# print "Creating doc vecs..."
+	# data = createDocVecs(data, vocabMap, dfCounts)
 
-	saveToJSON(data, "data.json")
+	# saveToJSON(data, "data.json")
 
