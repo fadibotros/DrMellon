@@ -128,8 +128,10 @@ class DialogManager():
 			return self.handle_chat(intent_request, session['sessionId'], session['user']['userId'])
 		elif intent_name == "symptomsIntent":
 			return self.handleSymptomsIntent(intent_request["intent"])
+		elif intent_name == "treatmentIntent":
+			return self.handleTreatmentIntent(intent_request["intent"])			
 		elif intent_name == "definitionIntent":
-                        return self.handleDefinitionIntent(intent_request["intent"])
+			return self.handleDefinitionIntent(intent_request["intent"])
 		else:
 			raise ValueError("Invalid intent")	    
 
