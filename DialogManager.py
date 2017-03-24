@@ -78,6 +78,7 @@ class DialogManager():
 		if "value" in intentObj["slots"]["Illnesses"]:
 			illnessName = intentObj["slots"]["Illnesses"]["value"]
 			illness = self.retval.getIllnessByName(illnessName)
+			self.currentIllness = illness
 
 			output = " ".join(illness["symptoms"][:2])
 			should_end_session = False
@@ -97,6 +98,7 @@ class DialogManager():
 		if "value" in intentObj["slots"]["Illnesses"]:
 			illnessName = intentObj["slots"]["Illnesses"]["value"]
 			illness = self.retval.getIllnessByName(illnessName)
+			self.currentIllness = illness
 
 			output = " ".join(illness["treatment"][:2])
 			should_end_session = False
