@@ -61,7 +61,7 @@ class Retrieval():
 		
 		for d in self.data:
 			score = cosine(d["docVec"], queryVec)
-			scores.append((d["title"], score))
+			scores.append((d, score))
 
 		scores = sorted(scores, key = lambda x: x[1])
 		return scores

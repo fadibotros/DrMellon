@@ -111,7 +111,8 @@ class DialogManager():
 	def handleFreeText(self,intentObj):
 		freeText = intentObj["slots"]["Words"]["value"]
 		illness = self.retval.retreive(freeText)
-		output = "I think you have " + illness[0][0]
+		output = "I think you have " + illness[0]["title"]
+		self.currentIllness = illness
 		should_end_session = False
 		return self.build_response({}, self.build_speechlet_response(
 				output, output, output, should_end_session))

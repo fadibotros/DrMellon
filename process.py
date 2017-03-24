@@ -144,29 +144,29 @@ def printIllnesses():
 
 
 if __name__ == '__main__':
-	printIllnesses()
-	# print "Reading data..."
-	# data = getAllDataFromDir("./data/")
-	# # data = getAllDataFromDir("./testData/")
+	# printIllnesses()
+	print "Reading data..."
+	data = getAllDataFromDir("./data/")
+	# data = getAllDataFromDir("./testData/")
 
-	# print "Reducing data..."
-	# data = reduce(data)
+	print "Reducing data..."
+	data = reduce(data)
 
-	# print "Cleaning data..."
-	# data = cleanData(data)
+	print "Cleaning data..."
+	data = cleanData(data)
 
-	# print "Adding tokens..."
-	# data = addTokens(data)
+	print "Adding tokens..."
+	data = addTokens(data)
 
-	# print "Getting vocab..."
-	# vocabMap = getVocab(data)
-	# saveToJSON(vocabMap, "vocab.json")
+	print "Getting vocab..."
+	vocabMap = getVocab(data)
+	saveToJSON(vocabMap, "vocab.json")
 
-	# print "Calculating DF..."
-	# dfCounts = getDFcounts(data, vocabMap)
+	print "Calculating DF..."
+	dfCounts = getDFcounts(data, vocabMap)
 
-	# print "Creating doc vecs..."
-	# data = createDocVecs(data, vocabMap, dfCounts)
+	print "Creating doc vecs..."
+	data = createDocVecs(data, vocabMap, dfCounts)
 
-	# saveToJSON(data, "data.json")
+	saveToJSON(data, "data.json")
 

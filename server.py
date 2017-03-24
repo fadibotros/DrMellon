@@ -57,7 +57,7 @@ class Handler(BaseHTTPRequestHandler):
 		
 		requestJson = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
 				
-		print json.dumps(requestJson)
+		# print json.dumps(requestJson)
 		responseJson = dm.getResponse(None,requestJson)
 		print ""
 		response = json.dumps(responseJson)
