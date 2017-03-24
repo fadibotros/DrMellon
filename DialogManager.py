@@ -81,10 +81,10 @@ class DialogManager():
 			illnessName = intentObj["slots"]["Illnesses"]["value"]
 			illness = self.retval.getIllnessByName(illnessName)
 
-			output = " ".join(illness["symtopn"][:2])
+			output = " ".join(illness["symptoms"][:2])
 			should_end_session = False
 		elif self.currentIllness != None:
-			output = " ".join(self.currentIllness["symtopn"][:2])
+			output = " ".join(self.currentIllness["symptoms"][:2])
 		else:
 			output = "Sorry I didn't quite understand that..."
 
@@ -110,8 +110,10 @@ class DialogManager():
 			return self.help()
 		elif intent_name == "RawText":
 			return self.handle_chat(intent_request, session['sessionId'], session['user']['userId'])
+		elif intent_name == "symptomsIntent":
+			return self.handleSymptomsIntent(intent_request["intent"])
 		elif intent_name == "definitionIntent":
-			return self.handleDefinitionIntent(intent_request["intent"])
+                        return self.handleDefinitionIntent(intent_request["intent"])
 		else:
 			raise ValueError("Invalid intent")	    
 
