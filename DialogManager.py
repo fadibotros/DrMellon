@@ -52,7 +52,7 @@ class DialogManager():
 		card_title = "Have a nice day!"
 		speech_output = "Have a nice day!"
 		should_end_session = True
-		return build_response({}, build_speechlet_response(
+		return build_response({}, self.build_speechlet_response(
 			card_title, speech_output, None, should_end_session))
 
 	def help(self):
@@ -60,10 +60,10 @@ class DialogManager():
 		speech_output = "Let's have a conversation. What do you want to talk about?"
 		reprompt_text = "What do you want to talk about?"
 		should_end_session = False
-		return build_response({}, build_speechlet_response(
+		return build_response({}, self.build_speechlet_response(
 			card_title, speech_output, reprompt_text, should_end_session))
 
-	def handleDefinitionIntent(intentObj):
+	def handleDefinitionIntent(self,intentObj):
 		illnessName = intentObj["slots"]["Illnesses"]["value"]
 		illness = self.retval.getIllnessByName(illnessName)
 
@@ -72,7 +72,7 @@ class DialogManager():
 		reprompt_text = illness["definition"][0]
 		should_end_session = False
 
-		return build_response({}, build_speechlet_response(
+		return self.build_response({}, self.build_speechlet_response(
 			card_title, speech_output, reprompt_text, should_end_session))
 
 
@@ -83,28 +83,27 @@ class DialogManager():
 
 		intent = intent_request['intent']
 		intent_name = intent_request['intent']['name']
-		slots = intent_request['intent']['slots']
 
 		# Dispatch to your skill's intent handlers
 		if intent_name == "HelloIntent":
 			return say_hello()
 		elif intent_name == "StopIntent":
-			return stop()
+			return self.stop()
 		elif intent_name == "HelpIntent":
-			return help()
+			return self.help()
 		elif intent_name == "RawText":
-			return handle_chat(intent_request, session['sessionId'], session['user']['userId'])
+			return self.handle_chat(intent_request, session['sessionId'], session['user']['userId'])
 		elif intent_name == "definitionIntent":
-			return handleDefinitionIntent(intent_request["intent"])
+			return self.handleDefinitionIntent(intent_request["intent"])
 		else:
 			raise ValueError("Invalid intent")	    
 
 	def getResponse(self,sessJSON, requestJSON):
 
 		response = None
-		if event['request']['type'] == "LaunchRequest":
-			response = say_hello()
-		elif event['request']['type'] == "IntentRequest":
-			response = on_intent(event['request'], event['session'])
+		if requestJSON['request']['type'] == "LaunchRequest":
+			response = self.say_hello()
+		elif requestJSON['request']['type'] == "IntentRequest":
+			response = self.on_intent(requestJSON['request'], requestJSON['session'])
 
 		return response

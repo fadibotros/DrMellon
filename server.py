@@ -59,7 +59,7 @@ class Handler(BaseHTTPRequestHandler):
 				
 		print json.dumps(requestJson)
 		responseJson = dm.getResponse(None,requestJson)
-	
+		print ""
 		response = json.dumps(responseJson)
 		self.wfile.write(response)
 		return

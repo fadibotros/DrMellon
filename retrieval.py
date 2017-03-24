@@ -78,7 +78,7 @@ class Retrieval():
 			scores.append((d,simScore))
 
 		scores = sorted(scores, key = lambda x: -x[1])
-		return scores[0][1]
+		return scores[0][0]
 
 		# if scores[0][1] > 80:
 		# 	return scores[0][0]
