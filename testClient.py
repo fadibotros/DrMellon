@@ -4,7 +4,7 @@ import socket
 import json
 
 
-hostip = 'ec2-54-152-211-122.compute-1.amazonaws.com'
+hostip = 'ec2-54-175-235-18.compute-1.amazonaws.com'
 port = 8080
 
 data = [1,2]

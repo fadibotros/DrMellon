@@ -60,12 +60,19 @@ class DialogManager():
 			output, output, output, should_end_session))
 
 	def handleDefinitionIntent(self,intentObj):
-		illnessName = intentObj["slots"]["Illnesses"]["value"]
-		illness = self.retval.getIllnessByName(illnessName)
-		self.currentIllness = illness
-
-		output = illness["definition"][0]
 		should_end_session = False
+		output = None
+
+		# check if user specified an illness
+		if "value" in intentObj["slots"]["Illnesses"]:
+			illnessName = intentObj["slots"]["Illnesses"]["value"]
+			illness = self.retval.getIllnessByName(illnessName)
+			self.currentIllness = illness
+			output = illness["definition"][0]
+		elif self.currentIllness != None:
+			output = self.currentIllness["definition"][0]
+		else:
+			output = "Sorry I didn't quite understand that..."
 
 		return self.build_response({}, self.build_speechlet_response(
 			output, output, output, should_end_session))
