@@ -19,9 +19,11 @@ from webSearch import webSearch
 class Retrieval():
 
 	def __init__(self):
-		self.data = self.readData("data.json")
+		# self.data = self.readData("data.json")
+		self.data = self.readData("dataWithPriors2.json")
 		self.vocab = self.readData("vocab.json")
 		self.data = self.addVectors(self.data,self.vocab)
+		self.expandedQueries = {}
 
 	def readData(self,filename):
 		with open(filename) as data_file:
@@ -40,10 +42,11 @@ class Retrieval():
 
 	def tokenize(self,strr):
 		wordnet_lemmatizer = WordNetLemmatizer()
+		strr = re.sub('[^a-zA-Z0-9-_.\s]', ' ', strr)
+		strr = re.sub('\s+', ' ', strr).strip()
 		strr = word_tokenize(strr)
 		strr = map(lambda x: wordnet_lemmatizer.lemmatize(x).lower(), strr)
-		punctuation = set(string.punctuation) | set(["''", "``", "--", "..."])
-		strr = filter(lambda x: x not in punctuation and x not in stopwords.words('english'), strr)
+		strr = filter(lambda x: x not in stopwords.words('english'), strr)
 		return strr
 
 	def getTextVec(self, tokens, vocab):
@@ -52,20 +55,29 @@ class Retrieval():
 		count = 1.0
 		for t in tokens:
 			if t in vocab:
-				vec[vocab[t]] += 1
+				vec[vocab[t][0]] += 1
 				count += 1.0
 
 		# vec = vec / float(len(tokens))
 		vec = vec / count
+
+		for t in tokens:
+			if t in vocab:
+				vec[vocab[t][0]] += vocab[t][1]
+
 		return vec
 
 	def expandQuery(self,query):
+		if query in self.expandedQueries:
+			return self.expandedQueries[query]
+
 		webPageResults = webSearch(query)
 		titles = map(lambda r: r["name"], webPageResults)
 		titlesTokenized = map(lambda t: self.tokenize(t), titles)
+		expandedTokens = list(itertools.chain.from_iterable(titlesTokenized))
 
-		return list(itertools.chain.from_iterable(titlesTokenized))
-
+		self.expandedQueries[query] = expandedTokens
+		return expandedTokens
 
 	def retreive(self, query, queryExpansionBool):
 		scores = []
@@ -79,11 +91,52 @@ class Retrieval():
 		queryVec = self.getTextVec(tokens, self.vocab)
 		
 		for d in self.data:
-			score = cosine(d["docVec"], queryVec)
+			score = 1.0 - cosine(d["docVec"], queryVec)
 			scores.append((d, score))
 
-		scores = sorted(scores, key = lambda x: x[1])
+		scores = sorted(scores, key = lambda x: -x[1])
 		return scores
+
+	def retreive2(self, query, queryExpansionBool, priorWeight):
+		scores = []
+		tokens = self.tokenize(query)
+
+		if queryExpansionBool == True:
+			# print len(tokens)
+			tokens += self.expandQuery(query)
+			# print len(tokens)
+
+		queryVec = self.getTextVec(tokens, self.vocab)
+		
+		for d in self.data:
+			score = 1.0 - cosine(d["docVec"], queryVec)
+			scores.append((d, score))
+
+		scoreSum = sum( map(lambda s: s[1], scores) )
+		scores = map(lambda s: (s[0], s[1]/scoreSum), scores)
+
+		# scores = map(lambda s: (s[0], s[1] * s[0]["prior"]), scores)
+		scores = map(lambda s: (s[0], (1-priorWeight) * s[1] + priorWeight * s[0]["prior"]), scores)
+
+		scores = sorted(scores, key = lambda x: -x[1])
+		return scores
+
+	def retreive3(self,query, expandQueryWeight):
+		scores = []
+		queryTokens = self.tokenize(query)
+		expandedQueryTokens = self.expandQuery(query)
+
+		queryVec = self.getTextVec(queryTokens, self.vocab)
+		expandedQueryVec = self.getTextVec(expandedQueryTokens, self.vocab)
+		
+		for d in self.data:
+			queryScore = 1.0 - cosine(d["docVec"], queryVec)
+			expandedQueryScore = 1.0 - cosine(d["docVec"], expandedQueryVec)
+			scores.append((d, (1.0-expandQueryWeight) * queryScore  + expandQueryWeight * expandedQueryScore))
+
+		scores = sorted(scores, key = lambda x: -x[1])
+		return scores
+
 
 	def getIllnessByName(self, illnessName):
 		iName = illnessName.lower()
@@ -136,39 +189,10 @@ if __name__ == '__main__':
 		# print retval.expandQuery(query)
 
 		answers = retval.retreive(query,True)
+		# answers = retval.retreive2(query,True, 0.35)
 
 		for a in answers[:10]:
 			print a[0]["title"] +  "\t" + str(a[1])
 
-# 25	Common cold
-# 489	Stress fractures
-# 33	Concussion
-# 4	Frostbite
-# 1	Eye floaters
-# 10	Bruxism (teeth grinding)
-# 40	Knee pain
-# 1	Hangovers
-# 158	Airplane ear
-# 1	Eyestrain
-# 10	Kidney stones
-# 19	Celiac disease
-# 3	Lactose intolerance
-# 23	Jellyfish stings
-# 7	Cold sore
 
-# 6	Common cold
-# 32	Stress fractures
-# 3	Concussion
-# 4	Frostbite
-# 1	Eye floaters
-# 8	Bruxism (teeth grinding)
-# 11	Knee pain
-# 2	Hangovers
-# 2	Airplane ear
-# 1	Eyestrain
-# 19	Kidney stones
-# 24	Celiac disease
-# 1	Lactose intolerance
-# 79	Jellyfish stings
-# 13	Cold sore
 

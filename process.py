@@ -72,7 +72,6 @@ def getVocab(data):
 	vocab = {}
 	idCounter = 0
 	for d in data:
-
 		for t in d["tokens"]:
 			if t not in vocab:
 				vocab[t] = idCounter
@@ -87,22 +86,27 @@ def getDFcounts(data, vocabMap):
 
 	for d in data:
 		for t in set(d["tokens"]):
-			dfCounts[vocabMap[t]] += 1
+			dfCounts[t] += 1
 
 	return dfCounts
 
-def createDocVecs(data, vocabMap, dfCounts):
+def getIdf(data,vocabMap):
 	numDocs = len(data)
+	dfCounts = getDFcounts(data,vocabMap)
+	idfCounts = {k: math.log( float(numDocs) / float(df)) for k, df in dfCounts.items()}
+	return idfCounts
+
+def createDocVecs(data, vocabMap):
 
 	for d in data:
 		docVec = defaultdict(float)
 		docLen = len(d["tokens"])
 
 		for t in d["tokens"]:
-			docVec[vocabMap[t]] += 1.0
+			docVec[vocabMap[t][0]] += 1.0
 
 		for key in docVec.keys():
-			docVec[key] = docVec[key]/numDocs + math.log( float(numDocs) / float(dfCounts[key]) )
+			docVec[key] = docVec[key]/docLen + vocabMap[t][1]
 
 		d["docVec"] = docVec
 		del d["tokens"]
@@ -117,13 +121,22 @@ def getTokens(jsonObj):
 		if jsonObj[key] != None:
 			allStr += " " + ' '.join(jsonObj[key])
 
-	allStr = allStr
-	allStrTokens = word_tokenize(allStr)
-	punctuation = set(string.punctuation) | set(["''", "``", "--", "..."])
-	allStrTokens = map(lambda x: wordnet_lemmatizer.lemmatize(x).lower(), allStrTokens)
-	allStrTokens = filter(lambda x: x not in punctuation and x not in stopwords.words('english'), allStrTokens)
+	allStrTokens  = tokenize(allStr)
+	# allStrTokens = word_tokenize(allStr)
+	# punctuation = set(string.punctuation) | set(["''", "``", "--", "..."])
+	# allStrTokens = map(lambda x: wordnet_lemmatizer.lemmatize(x).lower(), allStrTokens)
+	# allStrTokens = filter(lambda x: x not in punctuation and x not in stopwords.words('english'), allStrTokens)
 
 	return allStrTokens
+
+def tokenize(strr):
+	wordnet_lemmatizer = WordNetLemmatizer()
+	strr = re.sub('[^a-zA-Z0-9-_.\s]', ' ', strr)
+	strr = re.sub('\s+', ' ', strr).strip()
+	strr = word_tokenize(strr)
+	strr = map(lambda x: wordnet_lemmatizer.lemmatize(x).lower(), strr)
+	strr = filter(lambda x: x not in stopwords.words('english'), strr)
+	return strr	
 
 def saveToJSON(data, outfile):
 	with open(outfile, 'w') as outfile:
@@ -160,13 +173,17 @@ if __name__ == '__main__':
 
 	print "Getting vocab..."
 	vocabMap = getVocab(data)
+	idf = getIdf(data,vocabMap)
+
+	# add idf values to vocabMap  (id, idf)
+	vocabMap = {k: (v, idf[k]) for k, v in vocabMap.items()}
 	saveToJSON(vocabMap, "vocab.json")
 
-	print "Calculating DF..."
-	dfCounts = getDFcounts(data, vocabMap)
+	# print "Calculating DF..."
+	# dfCounts = getDFcounts(data, vocabMap)
 
 	print "Creating doc vecs..."
-	data = createDocVecs(data, vocabMap, dfCounts)
+	data = createDocVecs(data, vocabMap)
 
 	saveToJSON(data, "data.json")
 

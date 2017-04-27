@@ -8,6 +8,7 @@ import urllib
 import re
 from lxml import html
 from lxml import etree
+from fuzzywuzzy import fuzz
 
 
 def saveToJSON(data, outfile):
@@ -16,7 +17,7 @@ def saveToJSON(data, outfile):
 
 
 def loadJSON(filename):
-	with open('data.json') as data_file:    
+	with open(filename) as data_file:    
 		return json.load(data_file)
 
 def extractNumbersFromString(str):
@@ -26,6 +27,11 @@ def cleanString(txt):
 	txt = re.sub('[^a-zA-Z0-9-_.\s]', ' ', txt)
 	txt = re.sub('\s+', ' ', txt).strip()
 	return txt
+
+def illnessNamesMatch(str1, str2):
+	str1 = cleanString(str1).lower()
+	str2 = cleanString(str2).lower()
+	return fuzz.partial_ratio(str1, str2)
 
 def getNumOfComments(illnessName):
 	# baseURL = "http://www.medicinenet.com/script/main/srchcont.asp?src=eye+floaters"
@@ -45,6 +51,9 @@ def getNumOfComments(illnessName):
 
 		resultIllnessName = links[0].text_content()
 		resultIllnessLink = links[0].attrib['href']
+
+		if illnessNamesMatch(resultIllnessName, illnessName) < 50:
+			return ("",0)
 		
 		r = requests.get(baseURL + resultIllnessLink)
 		tree = html.fromstring(r.text)
@@ -80,8 +89,15 @@ def addPriors(data):
 
 if __name__ == '__main__':
 
-	data = loadJSON("data.json")
-	data = addPriors(data)
-	saveToJSON(data,"dataWithPriors.json")
-	
-	# getNumOfComments("Adult attention deficit hyperactivity disorder ADHD")
+	# data = loadJSON("data.json")
+	# data = addPriors(data)
+	# saveToJSON(data,"dataWithPriors.json")
+
+	data = loadJSON("dataWithPriors.json")
+
+	data = sorted(data, key= lambda d: -d["prior"])
+
+	for d in data[:40]:
+		print d["title"] + "\t" + str(d["numComments"])
+
+	# print illnessNamesMatch("High blood pressure in children", "Cold, Flu, Allergy Treatments")
