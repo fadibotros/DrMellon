@@ -117,6 +117,26 @@ class DialogManager():
 		return self.build_response({}, self.build_speechlet_response(
 				output, output, output, should_end_session))
 
+	def handleCausesIntent(self,intentObj):
+		should_end_session = False
+		output = None
+
+		# check if user specified an illness
+		if "value" in intentObj["slots"]["Illnesses"]:
+			illnessName = intentObj["slots"]["Illnesses"]["value"]
+			illness = self.retval.getIllnessByName(illnessName)
+			self.currentIllness = illness
+
+			output = " ".join(illness["causes"][:2])
+			should_end_session = False
+		elif self.currentIllness != None:
+			output = " ".join(self.currentIllness["causes"][:2])
+		else:
+			output = "Sorry I didn't quite understand that..."
+
+		return self.build_response({}, self.build_speechlet_response(
+				output, output, output, should_end_session))		
+
 	def handleFreeText(self,intentObj):
 		freeText = intentObj["slots"]["Words"]["value"]
 		illnesses = self.retval.retreive(freeText,True)
@@ -147,6 +167,8 @@ class DialogManager():
 			return self.handleSymptomsIntent(intent_request["intent"])
 		elif intent_name == "treatmentIntent":
 			return self.handleTreatmentIntent(intent_request["intent"])			
+		elif intent_name == "causesIntent":
+			return self.handleCausesIntent(intent_request["intent"])			
 		elif intent_name == "definitionIntent":
 			return self.handleDefinitionIntent(intent_request["intent"])
 		else:
