@@ -112,7 +112,7 @@ class DialogManager():
 
 	def handleFreeText(self,intentObj):
 		freeText = intentObj["slots"]["Words"]["value"]
-		illnesses = self.retval.retreive(freeText)
+		illnesses = self.retval.retreive(freeText,True)
 		output = "I think you have " + illnesses[0][0]["title"]
 		self.currentIllness = illnesses[0][0]
 		should_end_session = False
