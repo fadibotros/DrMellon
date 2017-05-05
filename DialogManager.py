@@ -71,6 +71,8 @@ class DialogManager():
 			output = illness["definition"][0]
 		elif self.currentIllness != None:
 			output = self.currentIllness["definition"][0]
+			addOn = "I can tell you about causes, systems and preventions for this condition. What would you like ?"
+			output += addOn
 		else:
 			output = "Sorry I didn't quite understand that..."
 
