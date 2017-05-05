@@ -62,17 +62,16 @@ class DialogManager():
 	def handleDefinitionIntent(self,intentObj):
 		should_end_session = False
 		output = None
-		addOn = "I can tell you about causes, systems and preventions for this condition. What would you like ?"
+		addOn = "I can tell you about causes, symptoms and treatments for this condition. What would you like ?"
 
 		# check if user specified an illness
 		if "value" in intentObj["slots"]["Illnesses"]:
 			illnessName = intentObj["slots"]["Illnesses"]["value"]
 			illness = self.retval.getIllnessByName(illnessName)
 			self.currentIllness = illness
-			output = illness["definition"][0] += addOn
+			output = illness["definition"][0] + " " +  addOn
 		elif self.currentIllness != None:
-			output = self.currentIllness["definition"][0]
-			output += addOn
+			output = self.currentIllness["definition"][0] + " " + addOn
 		else:
 			output = "Sorry I didn't quite understand that..."
 
