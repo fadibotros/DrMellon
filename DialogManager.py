@@ -65,7 +65,7 @@ class DialogManager():
 		addOn = "I can tell you about causes, symptoms and treatments for this condition. What would you like ?"
 
 		# check if user specified an illness
-		if "value" in intentObj["slots"]["Illnesses"]:
+		if Illnesses in intentObj["slots"] and "value" in intentObj["slots"]["Illnesses"]:
 			illnessName = intentObj["slots"]["Illnesses"]["value"]
 			illness = self.retval.getIllnessByName(illnessName)
 			self.currentIllness = illness
@@ -160,7 +160,7 @@ class DialogManager():
 			return say_hello()
 		elif intent_name == "StopIntent":
 			return self.stop()
-		elif intent_name == "HelpIntent":
+		elif intent_name == "HelpIntent" or intent_name = "NoIntent":
 			return self.help()
 		elif intent_name == "RawText":
 			return self.handleFreeText(intent_request["intent"])
@@ -170,7 +170,7 @@ class DialogManager():
 			return self.handleTreatmentIntent(intent_request["intent"])			
 		elif intent_name == "causesIntent":
 			return self.handleCausesIntent(intent_request["intent"])			
-		elif intent_name == "definitionIntent":
+		elif intent_name == "definitionIntent" and intent_name == "YesIntent":
 			return self.handleDefinitionIntent(intent_request["intent"])
 		else:
 			raise ValueError("Invalid intent")	    
